@@ -1,4 +1,4 @@
-#Lin Yunqi -- 2020/5/12
+#lyqheheda -- 2020/5/12
 #coursework.asm-- A multiplication program.
 
 .data
