@@ -62,12 +62,20 @@ int 21h
 
 
 
-; ring and print procedure 
+; ---------------------------------ring and print procedure 
 ring proc near 
 ; ISR
 ; 猜想：每秒自动被调用18.2次， 那么将一个寄存器设为0，每次被调用+1， 如果被调用54次则打印；
 ; 试验：若猜想正确，重写使每次被调用则打印，那么屏幕应该每秒有18条字符串被打印
 inc cx
+
+
+
+cmp cx, 18
+jge close
+
+continue:
+
 
 cmp cx, 54
 jne skip
@@ -94,14 +102,19 @@ out 42h,al
 ;delay
 
 
-in al,61h
-and al,0fch
-out 61h,al
 
 skip:
 iret 
-ring endp 
 
+
+close:
+in al,61h
+and al,0fch
+out 61h,al
+jmp continue
+
+ring endp 
+;--------------------------end of ring procedure
 
 
 code ends 
