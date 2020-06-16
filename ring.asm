@@ -13,70 +13,62 @@ data ends
 
 code segment 
 assume ds:data, cs:code, ss:stack
-
 start: 
 mov ax, data
 mov ds, ax
 
-; get the old interrupt vector…… 
+;----------get the old interrupt vector
 mov ah, 35h
 mov al, 1ch
 int 21h
 mov word ptr old,bx
 mov word ptr old+2, es
 
-;----------------------注册
-mov dx,cs      ;move the address of code segment(basic address of new procedure) to ds
+;move the address of code segment(basic address of new procedure) to ds
+mov dx,cs      
 mov ds,dx  
 
- ;install the new interrupt vector 
+;----------install the new interrupt vector 
 mov dx, offset ring
 mov ah,25h
 mov al,1ch
 int 21h
-;------------------------注册结束
 
-;-------------把ds换回来，下面还要用data里的字符串，这个好像有可能在之这句之前就调用了1ch，有风险，是不是放在ISR里边更好？
-mov ax,data;the ds is changed by previous line, now set back to get the datas
+;the ds is changed by previous line, now set back to get the datas
+mov ax,data
 mov ds,ax
 
-; delay some time for printing and ringing 
+;accumulator used for time delay.
 mov cx, count
 
-
-
-
-;restore the old interrupt vector 
-
-mov ah,0;等待键盘输入
+;wait for keyboard input
+mov ah,0
 int 16h
 
-
-; return to DOS 
-
-;主程序结束语句好像是应该放在这里，标志主程序结束，其他函数的代码放在主程序外面
-mov ah,4ch; end program
+;----------restore the old interrupt vector
+mov dx,word ptr old+2
+mov ds,dx
+mov dx,word ptr old
+mov ah,25h
+mov al,1ch
 int 21h
 
+;----------return to DOS 
+; end program
+mov ah,4ch
+int 21h
 
-
-
-
-; ---------------------------------ring and print procedure 
+;----------ring and print procedure 
 ring proc near 
 ; ISR
-; 猜想：每秒自动被调用18.2次， 那么将一个寄存器设为0，每次被调用+1， 如果被调用54次则打印；
-; 试验：若猜想正确，重写使每次被调用则打印，那么屏幕应该每秒有18条字符串被打印
 inc cx
 
-
-
+;turn off the sound if it lasts for a second
 cmp cx, 18
 jge close
-
 continue:
 
-
+;----------delay some time for printing and ringing 
 cmp cx, 54
 jne skip
 
@@ -85,7 +77,7 @@ mov ah,9
 int 21h
 mov cx, 1
 
-;-----------------------ring
+;ring the bell
 in al,61h
 or al,3
 out 61h,al
@@ -99,13 +91,8 @@ out 42h,al
 mov al,bh
 out 42h,al
 
-;delay
-
-
-
 skip:
 iret 
-
 
 close:
 in al,61h
@@ -114,8 +101,7 @@ out 61h,al
 jmp continue
 
 ring endp 
-;--------------------------end of ring procedure
-
+;end of ring procedure
 
 code ends 
 end start 
