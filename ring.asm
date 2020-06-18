@@ -1,5 +1,19 @@
+;***********************************************************************************************
+;*                                                                                             *
+;*                 Project Name : ring and print a message per 3 seconds                       *
+;*                                                                                             *
+;*                    File Name : ring.asm                                                     *
+;*                                                                                             *
+;*                   Programmer : Lin Yunqi                                                    *
+;*                                                                                             *
+;*                   Student ID : 18722016                                                     *
+;*                                                                                             *
+;*                  Last Update : 2020/6/18                                                    *
+;*                                                                                             *
+;*---------------------------------------------------------------------------------------------*
+
 ; assembler frame 
-; ring and print a message per 3 seconds 
+
 stack segment 
 db  128 dup(0) 
 stack ends 
